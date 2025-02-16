@@ -1,0 +1,35 @@
+{
+  "name": "clean-arch-template",
+  "version": "1.0.0",
+  "description": "Clean Architecture Template",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "format": "pnpm exec biome format --write ./src/",
+    "lint": "pnpm exec biome lint --write ./src/",
+    "postinstall": "lefthook install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "clean architecture",
+    "template",
+    "software design",
+    "javascript",
+    "nodejs",
+    "template repository"
+  ],
+  "author": {
+    "name": "Luiz Felipe",
+    "url": "https://github.com/luizfelipedasilva678"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
+    "lefthook": "^1.10.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}

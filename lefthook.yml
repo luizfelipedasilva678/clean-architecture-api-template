@@ -1,0 +1,12 @@
+pre-commit:
+  commands:
+    format:
+      run: pnpm run format
+    lint:
+      run: pnpm run lint
+
+commit-msg:
+  parallel: true
+  scripts:
+    "commitlint.sh":
+      runner: bash
