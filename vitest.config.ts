@@ -1,11 +1,14 @@
 import { defineConfig, configDefaults } from "vitest/config";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   test: {
     dir: "./tests",
     globals: true,
     exclude: [...configDefaults.exclude],
     coverage: {
+      provider: "v8",
       reporter: ["text"],
       exclude: [...configDefaults.exclude],
       thresholds: {
