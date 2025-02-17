@@ -8,7 +8,8 @@
     "format": "pnpm exec biome format --write ./src/",
     "lint": "pnpm exec biome lint --write ./src/",
     "postinstall": "lefthook install",
-    "test": "vitest"
+    "test": "vitest",
+    "build": "pnpm exec tsc -b"
   },
   "keywords": [
     "clean architecture",
