@@ -27,7 +27,7 @@ describe("Create User Web Controller", () => {
       },
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(201);
     expect(response.body).toEqual({
       id: 1,
       name: "John Doe",

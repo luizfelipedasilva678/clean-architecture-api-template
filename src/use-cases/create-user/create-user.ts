@@ -26,8 +26,10 @@ class CreateUser implements UseCase<CreateUserDTO, UserDTO> {
   public async execute(
     input: CreateUserDTO
   ): Promise<UserDTO | LoginExistsError | InvalidInputError> {
-    if (!this.inputValidator.isValid(input)) {
-      return new InvalidInputError();
+    const validationResult = this.inputValidator.validate(input);
+
+    if (validationResult.length > 0) {
+      return new InvalidInputError(validationResult);
     }
 
     const user = new User(0, input.name, input.login, input.password);
