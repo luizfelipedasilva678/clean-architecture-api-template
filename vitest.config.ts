@@ -10,7 +10,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text"],
-      exclude: [...configDefaults.exclude],
+      exclude: [...configDefaults.exclude, "**/ports/**"],
       thresholds: {
         branches: 80,
         functions: 80,

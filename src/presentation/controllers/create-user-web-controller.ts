@@ -6,7 +6,7 @@ import type {
 } from "@/presentation/ports";
 import {
   InvalidInputError,
-  LoginExistsError,
+  type LoginExistsError,
 } from "@/use-cases/create-user/errors";
 
 type CreateUserUseCase = UseCase<
@@ -23,28 +23,21 @@ class CreateUserWebController implements Controller<HttpRequest, HttpResponse> {
 
   async execute(request: HttpRequest): Promise<HttpResponse> {
     const body: CreateUserDTO = {
-      login: request.body.login ?? "",
-      name: request.body.name ?? "",
-      password: request.body.password ?? "",
+      login: request?.body?.login ?? "",
+      name: request?.body?.name ?? "",
+      password: request?.body?.password ?? "",
     };
 
     const opResult = await this.useCase.execute(body);
 
-    if (opResult instanceof LoginExistsError) {
+    if (opResult instanceof Error) {
       return {
         statusCode: 400,
         body: {
           message: opResult.message,
-        },
-      };
-    }
-
-    if (opResult instanceof InvalidInputError) {
-      return {
-        statusCode: 400,
-        body: {
-          message: opResult.message,
-          details: opResult.details,
+          ...(opResult instanceof InvalidInputError
+            ? { details: opResult.details }
+            : {}),
         },
       };
     }
