@@ -1,5 +1,5 @@
 interface HttpRequest {
-  body: Record<string, any>;
+	body: Record<string, any>;
 }
 
 export default HttpRequest;
