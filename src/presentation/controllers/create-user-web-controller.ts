@@ -9,11 +9,6 @@ import {
   type LoginExistsError,
 } from "@/use-cases/create-user/errors";
 
-type CreateUserUseCase = UseCase<
-  CreateUserDTO,
-  UserDTO | LoginExistsError | InvalidInputError
->;
-
 class CreateUserWebController implements Controller<HttpRequest, HttpResponse> {
   private readonly useCase: CreateUserUseCase;
 
@@ -52,5 +47,10 @@ class CreateUserWebController implements Controller<HttpRequest, HttpResponse> {
     };
   }
 }
+
+type CreateUserUseCase = UseCase<
+  CreateUserDTO,
+  UserDTO | LoginExistsError | InvalidInputError
+>;
 
 export default CreateUserWebController;
