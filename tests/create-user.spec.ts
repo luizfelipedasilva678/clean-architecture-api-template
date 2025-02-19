@@ -7,16 +7,19 @@ import {
   InvalidInputError,
   LoginExistsError,
 } from "@/use-cases/create-user/errors";
+import BcryptJsEncoder from "@/external/encoder/bcryptjs-encoder";
 
 describe("Create User", () => {
   let repository: InMemoryUserRepository;
   let useCase: CreateUser;
   let validator: CreateUserInputValidator;
+  let encoder: BcryptJsEncoder;
 
   beforeAll(() => {
     repository = new InMemoryUserRepository();
     validator = new Validator();
-    useCase = new CreateUser(repository, validator);
+    encoder = new BcryptJsEncoder();
+    useCase = new CreateUser(repository, validator, encoder);
   });
 
   it("should create a user correctly", async () => {
