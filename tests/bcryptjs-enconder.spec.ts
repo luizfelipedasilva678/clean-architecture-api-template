@@ -1,4 +1,4 @@
-import BcryptJsEncoder from "@/external/encoder/bcryptjs-encoder";
+import { BcryptJsEncoder } from "@/external/encoder";
 import { describe, it, expect } from "vitest";
 
 describe("BcryptJsEncoder", () => {

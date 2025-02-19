@@ -7,7 +7,7 @@ import {
   InvalidInputError,
   LoginExistsError,
 } from "@/use-cases/create-user/errors";
-import BcryptJsEncoder from "@/external/encoder/bcryptjs-encoder";
+import { BcryptJsEncoder } from "@/external/encoder";
 
 describe("Create User", () => {
   let repository: InMemoryUserRepository;

@@ -4,7 +4,7 @@ import { CreateUserWebController } from "@/presentation/controllers";
 import type CreateUserInputValidator from "@/use-cases/ports/create-user-input-validator";
 import Validator from "./doubles/CreateUserValidator";
 import InMemoryUserRepository from "./doubles/InMemoryUserRepository";
-import BcryptJsEncoder from "@/external/encoder/bcryptjs-encoder";
+import { BcryptJsEncoder } from "@/external/encoder";
 
 describe("Create User Web Controller", () => {
   let repository: InMemoryUserRepository;
