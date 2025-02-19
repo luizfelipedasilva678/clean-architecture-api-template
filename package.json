@@ -4,7 +4,7 @@
   "description": "Clean Architecture Template",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/main/server.ts",
+    "dev": "tsx watch src/main/index.ts",
     "format": "biome format --write ./src/",
     "lint": "biome lint --write ./src/",
     "postinstall": "lefthook install",
@@ -32,6 +32,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.4",
     "@vitest/coverage-v8": "3.0.5",
+    "dotenv": "^16.4.7",
     "lefthook": "^1.10.10",
     "rimraf": "^6.0.1",
     "tsx": "^4.19.2",
