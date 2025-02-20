@@ -1,8 +1,7 @@
-import type { CreateUserDTO, UseCase, CreatedUserDTO } from "@/use-cases/ports";
 import BaseWebController from "@/presentation/controllers/base-web-controller";
 import {
   badRequest,
-  created,
+  ok,
   internalServerError,
 } from "@/presentation/controllers/helpers";
 import type {
@@ -10,18 +9,16 @@ import type {
   HttpRequest,
   HttpResponse,
 } from "@/presentation/ports";
-import {
-  InvalidInputError,
-  type LoginExistsError,
-} from "@/use-cases/create-user/errors";
+import type { SignDTO, SuccessfulSignInDTO, UseCase } from "@/use-cases/ports";
+import type { IncorrectUserOrPasswordError } from "@/use-cases/sign-in/errors";
 
-class CreateUserWebController
+class SignInWebController
   extends BaseWebController
   implements Controller<HttpRequest, HttpResponse>
 {
-  private readonly useCase: CreateUserUseCase;
+  private readonly useCase: SignInUseCase;
 
-  public constructor(useCase: CreateUserUseCase) {
+  constructor(useCase: SignInUseCase) {
     super();
     this.useCase = useCase;
   }
@@ -29,7 +26,7 @@ class CreateUserWebController
   public async execute(request: HttpRequest): Promise<HttpResponse> {
     try {
       const missingParams = this.getMissingParams(
-        ["login", "name", "password"],
+        ["login", "password"],
         request.body
       );
 
@@ -41,34 +38,25 @@ class CreateUserWebController
 
       const useCaseResponse = await this.useCase.execute({
         login: request.body.login,
-        name: request.body.name,
         password: request.body.password,
       });
 
       if (useCaseResponse instanceof Error) {
-        const isInvalidInputError =
-          useCaseResponse instanceof InvalidInputError;
-
         return badRequest({
           message: useCaseResponse.message,
-          ...(isInvalidInputError ? { details: useCaseResponse.details } : {}),
         });
       }
 
-      return created({
-        id: useCaseResponse.id,
-        name: useCaseResponse.name,
-        login: useCaseResponse.login,
-      });
+      return ok(useCaseResponse);
     } catch (error) {
       return internalServerError();
     }
   }
 }
 
-type CreateUserUseCase = UseCase<
-  CreateUserDTO,
-  CreatedUserDTO | LoginExistsError | InvalidInputError
+type SignInUseCase = UseCase<
+  SignDTO,
+  SuccessfulSignInDTO | IncorrectUserOrPasswordError
 >;
 
-export default CreateUserWebController;
+export default SignInWebController;

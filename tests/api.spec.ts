@@ -1,15 +1,15 @@
-import routesV1 from "@/main/config/setupV1Routes";
-import Fastify, { type FastifyInstance } from "fastify";
+import routesV1 from "@/main/config/routesV1";
+import { fastify, type FastifyInstance } from "fastify";
 import { describe, it, expect, beforeAll } from "vitest";
 import "dotenv/config";
 import { setupTestDB } from "./helpers";
 
 describe("Rest API", () => {
-  const app: FastifyInstance = Fastify();
+  const app: FastifyInstance = fastify();
 
   beforeAll(async () => {
     await setupTestDB();
-    app.register(routesV1, { prefix: "api/v1" });
+    app.register(routesV1, { prefix: "/api/v1" });
   });
 
   it("should create a user correctly", async () => {
