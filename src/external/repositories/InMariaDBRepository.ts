@@ -30,7 +30,7 @@ class InMariaDBRepository implements UserRepository {
 		};
 	}
 
-	public async findByLogin(login: string): Promise<UserDTO> {
+	public async findByLogin(login: string): Promise<UserDTO | null> {
 		const sql = "SELECT id, name, login FROM users WHERE login = ?";
 		const values = [login];
 

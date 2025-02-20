@@ -1,1 +1,1 @@
-import dd from "./mysql-helper";
+export { default as MySqlHelper } from "./mysql-helper";

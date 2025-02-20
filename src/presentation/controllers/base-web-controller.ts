@@ -1,5 +1,5 @@
 class BaseWebController {
-	getMissingParams(
+	protected getMissingParams(
 		requiredParams: string[],
 		params: Record<string, any>,
 	): string[] {

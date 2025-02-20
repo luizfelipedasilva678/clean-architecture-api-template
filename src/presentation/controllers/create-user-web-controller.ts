@@ -35,7 +35,7 @@ class CreateUserWebController
 
 			if (missingParams.length > 0) {
 				return badRequest({
-					message: `Missing params: " ${missingParams.join(", ")}`,
+					message: `Missing params: ${missingParams.join(", ")}`,
 				});
 			}
 
