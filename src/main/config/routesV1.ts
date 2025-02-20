@@ -1,6 +1,7 @@
 import { FastifyAdapter } from "@/main/adapters";
 import { internalServerError } from "@/shared";
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
+import FastifySessionManagerAdapter from "../adapters/fastify-session-manager-adapter";
 import {
 	makeCreateUserWebController,
 	makeSignInWebController,
@@ -41,20 +42,18 @@ function routesV1(
 
 	app.post("/sign-in", async (request, response) => {
 		try {
-			const controller = await makeSignInWebController();
+			const sessionManger = new FastifySessionManagerAdapter(request.session);
+			const controller = await makeSignInWebController(sessionManger);
 			const controllerResponse = await controller.execute(
 				FastifyAdapter.adapt(request),
 			);
 
-			if (request.session.authenticated) {
-				return response.redirect("/");
+			if ("url" in controllerResponse) {
+				return response.redirect(
+					app.prefix + controllerResponse.url,
+					controllerResponse.statusCode,
+				);
 			}
-
-			request.session.user = {
-				id: controllerResponse.body.id,
-				login: controllerResponse.body.login,
-			};
-			request.session.authenticated = true;
 
 			return response
 				.code(controllerResponse.statusCode)

@@ -28,4 +28,11 @@ function badRequest(body: any) {
 	};
 }
 
-export { ok, created, badRequest, internalServerError };
+function redirect(url: string) {
+	return {
+		statusCode: 302,
+		url,
+	};
+}
+
+export { ok, created, badRequest, internalServerError, redirect };

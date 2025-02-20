@@ -2,16 +2,11 @@ import Fastify from "fastify";
 import routesV1 from "@/main/config/routesV1";
 import fastifyCookie from "@fastify/cookie";
 import { fastifySession } from "@fastify/session";
+import type { Session as PresentationSession } from "@/presentation/ports/session-manager";
 import "dotenv/config";
 
 declare module "fastify" {
-	interface Session {
-		user?: {
-			id: string;
-			login: string;
-		};
-		authenticated: boolean;
-	}
+	interface Session extends PresentationSession {}
 }
 
 async function init() {

@@ -4,6 +4,8 @@ import { describe, it, expect, beforeAll } from "vitest";
 import "dotenv/config";
 import { setupTestDB } from "./helpers";
 
+process.env.ENVIRONMENT = "test";
+
 describe("Rest API", () => {
   const app: FastifyInstance = fastify();
 
