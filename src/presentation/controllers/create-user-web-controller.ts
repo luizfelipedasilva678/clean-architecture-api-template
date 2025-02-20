@@ -1,4 +1,4 @@
-import type { CreateUserDTO, UseCase, UserDTO } from "@/use-cases/ports";
+import type { CreateUserDTO, UseCase, CreatedUserDTO } from "@/use-cases/ports";
 import BaseWebController from "./base-web-controller";
 import {
 	badRequest,
@@ -68,7 +68,7 @@ class CreateUserWebController
 
 type CreateUserUseCase = UseCase<
 	CreateUserDTO,
-	UserDTO | LoginExistsError | InvalidInputError
+	CreatedUserDTO | LoginExistsError | InvalidInputError
 >;
 
 export default CreateUserWebController;

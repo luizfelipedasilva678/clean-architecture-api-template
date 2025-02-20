@@ -28,7 +28,12 @@ describe("InMariaDBRepository", () => {
   it("should return user by login correctly", async () => {
     const user = await repository.findByLogin("johndoe");
 
-    expect(user).toEqual({ id: 1, name: "John Doe", login: "johndoe" });
+    expect(user).toEqual({
+      id: 1,
+      name: "John Doe",
+      login: "johndoe",
+      password: "test123@",
+    });
   });
 
   it("should return undefined when user does not exist", async () => {

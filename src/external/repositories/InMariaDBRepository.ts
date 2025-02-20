@@ -1,4 +1,9 @@
-import type { CreateUserDTO, UserDTO, UserRepository } from "@/use-cases/ports";
+import type {
+	CreateUserDTO,
+	CreatedUserDTO,
+	UserRepository,
+	UserFoundDTO,
+} from "@/use-cases/ports";
 import type {
 	PoolConnection,
 	ResultSetHeader,
@@ -12,7 +17,7 @@ class InMariaDBRepository implements UserRepository {
 		this.connection = connection;
 	}
 
-	public async create(user: CreateUserDTO): Promise<UserDTO> {
+	public async create(user: CreateUserDTO): Promise<CreatedUserDTO> {
 		const sql = "INSERT INTO users (name, login, password) VALUES (?, ?, ?)";
 		const values = [user.name, user.login, user.password];
 
@@ -30,8 +35,8 @@ class InMariaDBRepository implements UserRepository {
 		};
 	}
 
-	public async findByLogin(login: string): Promise<UserDTO | null> {
-		const sql = "SELECT id, name, login FROM users WHERE login = ?";
+	public async findByLogin(login: string): Promise<UserFoundDTO | null> {
+		const sql = "SELECT id, name, login, password FROM users WHERE login = ?";
 		const values = [login];
 
 		const [rows] = await this.connection.execute<RowDataPacket[]>(sql, values);
@@ -42,7 +47,7 @@ class InMariaDBRepository implements UserRepository {
 
 		if (!user) return null;
 
-		return user as UserDTO;
+		return user as UserFoundDTO;
 	}
 }
 

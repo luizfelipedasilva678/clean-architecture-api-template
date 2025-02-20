@@ -8,11 +8,11 @@ import type {
 	CreateUserDTO,
 	Encoder,
 	UseCase,
-	UserDTO,
+	CreatedUserDTO,
 	UserRepository,
 } from "@/use-cases/ports";
 
-class CreateUser implements UseCase<CreateUserDTO, UserDTO> {
+class CreateUser implements UseCase<CreateUserDTO, CreatedUserDTO> {
 	private readonly userRepository: UserRepository;
 	private readonly inputValidator: CreateUserInputValidator;
 	private readonly encoder: Encoder;
@@ -29,7 +29,7 @@ class CreateUser implements UseCase<CreateUserDTO, UserDTO> {
 
 	public async execute(
 		input: CreateUserDTO,
-	): Promise<UserDTO | LoginExistsError | InvalidInputError> {
+	): Promise<CreatedUserDTO | LoginExistsError | InvalidInputError> {
 		const validationResult = this.inputValidator.validate(input);
 
 		if (validationResult.length > 0) {
