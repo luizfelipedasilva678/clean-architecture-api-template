@@ -12,7 +12,13 @@ import type {
 	UserRepository,
 } from "@/use-cases/ports";
 
-class CreateUser implements UseCase<CreateUserDTO, CreatedUserDTO> {
+class CreateUser
+	implements
+		UseCase<
+			CreateUserDTO,
+			CreatedUserDTO | LoginExistsError | InvalidInputError
+		>
+{
 	private readonly userRepository: UserRepository;
 	private readonly inputValidator: CreateUserInputValidator;
 	private readonly encoder: Encoder;
