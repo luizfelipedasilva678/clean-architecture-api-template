@@ -1,6 +1,7 @@
 interface SuccessfulSignInDTO {
-	id: string;
-	login: string;
+  id: string;
+  login: string;
+  authenticated: boolean;
 }
 
 export default SuccessfulSignInDTO;
