@@ -5,6 +5,8 @@ import type CreateUserInputValidator from "@/use-cases/ports/create-user-input-v
 import Validator from "./doubles/CreateUserValidator";
 import InMemoryUserRepository from "./doubles/InMemoryUserRepository";
 import { BcryptJsEncoder } from "@/external/encoder";
+import SessionManagerDouble from "./doubles/SessionManagerDouble";
+import { HttpResponse } from "@/presentation/ports";
 
 describe("Create User Web Controller", () => {
   let repository: InMemoryUserRepository;
@@ -12,13 +14,15 @@ describe("Create User Web Controller", () => {
   let validator: CreateUserInputValidator;
   let controller: CreateUserWebController;
   let encoder: BcryptJsEncoder;
+  let sessionManager: SessionManagerDouble;
 
   beforeAll(() => {
     repository = new InMemoryUserRepository();
     validator = new Validator();
     encoder = new BcryptJsEncoder();
     useCase = new CreateUser(repository, validator, encoder);
-    controller = new CreateUserWebController(useCase);
+    sessionManager = new SessionManagerDouble();
+    controller = new CreateUserWebController(useCase, sessionManager);
   });
 
   it("should create a user correctly", async () => {
@@ -31,7 +35,8 @@ describe("Create User Web Controller", () => {
     });
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toEqual({
+    expect(response).toHaveProperty("body");
+    expect((response as HttpResponse).body).toEqual({
       id: 1,
       name: "John Doe",
       login: "johndoe",
@@ -48,7 +53,7 @@ describe("Create User Web Controller", () => {
     });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body).toEqual({
+    expect((response as HttpResponse).body).toEqual({
       message: "Login already exists",
     });
   });
@@ -63,7 +68,23 @@ describe("Create User Web Controller", () => {
     });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("message");
-    expect(response.body).toHaveProperty("details");
+    expect((response as HttpResponse).body).toHaveProperty("message");
+    expect((response as HttpResponse).body).toHaveProperty("details");
+  });
+
+  it("should return an redirect if user is authenticated", async () => {
+    sessionManager.create({
+      authenticated: true,
+    });
+
+    const response = await controller.execute({
+      body: {
+        login: "johndoe",
+        name: "John Doe",
+        password: "test123@",
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
   });
 });
