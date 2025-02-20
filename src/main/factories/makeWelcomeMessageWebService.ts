@@ -2,9 +2,9 @@ import { WelcomeMessageWebService } from "@/presentation/services";
 import type { SessionManager } from "@/presentation/ports";
 
 async function makeWelcomeMessageWebService(sessionManager: SessionManager) {
-	const controller = new WelcomeMessageWebService(sessionManager);
+	const service = new WelcomeMessageWebService(sessionManager);
 
-	return controller;
+	return service;
 }
 
 export default makeWelcomeMessageWebService;

@@ -8,12 +8,25 @@ import {
 	makeSignInWebController,
 	makeSignOutWebService,
 } from "@/main/factories";
+import makeGetSessionService from "../factories/makeGetSessionService";
 
 function routesV1(
 	app: FastifyInstance,
 	_: Record<string, unknown>,
 	done: (error?: Error) => void,
 ) {
+	app.get("/session", async (request, response) => {
+		try {
+			const sessionManager = new FastifySessionManagerAdapter(request.session);
+			const service = await makeGetSessionService(sessionManager);
+			const serviceResponse = await service.execute();
+
+			return sendResponse(response, serviceResponse);
+		} catch (err) {
+			return handleError(response);
+		}
+	});
+
 	app.get("/", async (request, response) => {
 		try {
 			const sessionManager = new FastifySessionManagerAdapter(request.session);
