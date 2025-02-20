@@ -1,79 +1,92 @@
-import { FastifyAdapter } from "@/main/adapters";
+import { FastifyAdapter, FastifySessionManagerAdapter } from "@/main/adapters";
 import { internalServerError } from "@/shared";
 import type { FastifyInstance } from "fastify";
-import FastifySessionManagerAdapter from "../adapters/fastify-session-manager-adapter";
 import {
-	makeCreateUserWebController,
-	makeSignInWebController,
+  makeCreateUserWebController,
+  makeSignInWebController,
+  makeSignOutWebController,
 } from "@/main/factories";
 
 function routesV1(
-	app: FastifyInstance,
-	_: Record<string, unknown>,
-	done: (error?: Error) => void,
+  app: FastifyInstance,
+  _: Record<string, unknown>,
+  done: (error?: Error) => void
 ) {
-	app.get("/", async (request, response) => {
-		if (request.session.authenticated) {
-			return response.send({
-				message: `Hello, ${request?.session?.user?.login}`,
-			});
-		}
+  const serverError = internalServerError();
 
-		return response.send({
-			message: "Hello, visitor",
-		});
-	});
+  app.get("/", async (request, response) => {
+    if (request.session.authenticated) {
+      return response.send({
+        message: `Hello, ${request?.session?.user?.login}`,
+      });
+    }
 
-	app.post("/users", async (request, response) => {
-		try {
-			const controller = await makeCreateUserWebController();
-			const controllerResponse = await controller.execute(
-				FastifyAdapter.adapt(request),
-			);
+    return response.send({
+      message: "Hello, visitor",
+    });
+  });
 
-			response
-				.code(controllerResponse.statusCode)
-				.send(controllerResponse.body);
-		} catch (err) {
-			const serverError = internalServerError();
-			response.code(serverError.statusCode).send(serverError.body);
-		}
-	});
+  app.post("/users", async (request, response) => {
+    try {
+      const controller = await makeCreateUserWebController();
+      const controllerResponse = await controller.execute(
+        FastifyAdapter.adapt(request)
+      );
 
-	app.post("/sign-in", async (request, response) => {
-		try {
-			const sessionManger = new FastifySessionManagerAdapter(request.session);
-			const controller = await makeSignInWebController(sessionManger);
-			const controllerResponse = await controller.execute(
-				FastifyAdapter.adapt(request),
-			);
+      response
+        .code(controllerResponse.statusCode)
+        .send(controllerResponse.body);
+    } catch (err) {
+      const serverError = internalServerError();
+      response.code(serverError.statusCode).send(serverError.body);
+    }
+  });
 
-			if ("url" in controllerResponse) {
-				return response.redirect(
-					app.prefix + controllerResponse.url,
-					controllerResponse.statusCode,
-				);
-			}
+  app.post("/sign-in", async (request, response) => {
+    try {
+      const sessionManger = new FastifySessionManagerAdapter(request.session);
+      const controller = await makeSignInWebController(sessionManger);
+      const controllerResponse = await controller.execute(
+        FastifyAdapter.adapt(request)
+      );
 
-			return response
-				.code(controllerResponse.statusCode)
-				.send(controllerResponse.body);
-		} catch (err) {
-			const serverError = internalServerError();
-			response.code(serverError.statusCode).send(serverError.body);
-		}
-	});
+      if ("url" in controllerResponse) {
+        return response.redirect(
+          app.prefix + controllerResponse.url,
+          controllerResponse.statusCode
+        );
+      }
 
-	app.get("/sign-out", async (request, response) => {
-		if (request.session.authenticated) {
-			request.session.authenticated = false;
-			await request.session.destroy();
+      return response
+        .code(controllerResponse.statusCode)
+        .send(controllerResponse.body);
+    } catch (err) {
+      response.code(serverError.statusCode).send(serverError.body);
+    }
+  });
 
-			return response.redirect("/");
-		}
-	});
+  app.get("/sign-out", async (request, response) => {
+    try {
+      const sessionManger = new FastifySessionManagerAdapter(request.session);
+      const controller = await makeSignOutWebController(sessionManger);
+      const controllerResponse = await controller.execute();
 
-	done();
+      if ("url" in controllerResponse) {
+        return response.redirect(
+          app.prefix + controllerResponse.url,
+          controllerResponse.statusCode
+        );
+      }
+
+      return response
+        .code(controllerResponse.statusCode)
+        .send(controllerResponse.body);
+    } catch (err) {
+      response.code(serverError.statusCode).send(serverError.body);
+    }
+  });
+
+  done();
 }
 
 export default routesV1;
