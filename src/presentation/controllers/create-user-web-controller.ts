@@ -1,10 +1,12 @@
 import type { CreateUserDTO, UseCase, CreatedUserDTO } from "@/use-cases/ports";
 import BaseWebController from "@/presentation/controllers/base-web-controller";
-import { badRequest, created, internalServerError } from "@/shared";
+import { badRequest, created, internalServerError, redirect } from "@/shared";
 import type {
 	Controller,
+	HttpRedirect,
 	HttpRequest,
 	HttpResponse,
+	SessionManager,
 } from "@/presentation/ports";
 import {
 	InvalidInputError,
@@ -13,17 +15,28 @@ import {
 
 class CreateUserWebController
 	extends BaseWebController
-	implements Controller<HttpRequest, HttpResponse>
+	implements Controller<HttpRequest, HttpResponse | HttpRedirect>
 {
 	private readonly useCase: CreateUserUseCase;
+	private readonly sessionManager: SessionManager;
 
-	public constructor(useCase: CreateUserUseCase) {
+	public constructor(
+		useCase: CreateUserUseCase,
+		sessionManager: SessionManager,
+	) {
 		super();
 		this.useCase = useCase;
+		this.sessionManager = sessionManager;
 	}
 
-	public async execute(request: HttpRequest): Promise<HttpResponse> {
+	public async execute(
+		request: HttpRequest,
+	): Promise<HttpResponse | HttpRedirect> {
 		try {
+			if (this.sessionManager.get().authenticated) {
+				return redirect("/");
+			}
+
 			const missingParams = this.getMissingParams(
 				["login", "name", "password"],
 				request.body,
