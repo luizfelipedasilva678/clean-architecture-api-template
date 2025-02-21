@@ -6,3 +6,5 @@ export { default as Encoder } from "@/use-cases/ports/encoder";
 export { default as SignDTO } from "@/use-cases/ports/sign-in-dto";
 export { default as SuccessfulSignInDTO } from "@/use-cases/ports/successful-sign-in-dto";
 export { default as UserFoundDTO } from "@/use-cases/ports/user-found-dto";
+export * from "@/use-cases/ports/session-manager";
+export { default as LoggedUserDTO } from "@/use-cases/ports/logged-user-dto";

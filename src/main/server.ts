@@ -2,7 +2,7 @@ import Fastify from "fastify";
 import routesV1 from "@/main/config/routesV1";
 import fastifyCookie from "@fastify/cookie";
 import { fastifySession } from "@fastify/session";
-import type { Session as PresentationSession } from "@/presentation/ports/session-manager";
+import type { Session as PresentationSession } from "@/use-cases/ports/session-manager";
 import fastifyHelmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import "dotenv/config";

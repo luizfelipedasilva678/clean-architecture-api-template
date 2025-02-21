@@ -6,11 +6,11 @@ import type {
 	HttpRedirect,
 	HttpRequest,
 	HttpResponse,
-	SessionManager,
 } from "@/presentation/ports";
 import {
 	InvalidInputError,
 	type LoginExistsError,
+	UserAlreadyLoggedError,
 } from "@/use-cases/create-user/errors";
 
 class CreateUserWebController
@@ -18,25 +18,16 @@ class CreateUserWebController
 	implements Controller<HttpRequest, HttpResponse | HttpRedirect>
 {
 	private readonly useCase: CreateUserUseCase;
-	private readonly sessionManager: SessionManager;
 
-	public constructor(
-		useCase: CreateUserUseCase,
-		sessionManager: SessionManager,
-	) {
+	public constructor(useCase: CreateUserUseCase) {
 		super();
 		this.useCase = useCase;
-		this.sessionManager = sessionManager;
 	}
 
 	public async execute(
 		request: HttpRequest,
 	): Promise<HttpResponse | HttpRedirect> {
 		try {
-			if (this.sessionManager.get().authenticated) {
-				return redirect("/");
-			}
-
 			const missingParams = this.getMissingParams(
 				["login", "name", "password"],
 				request.body,
@@ -55,6 +46,10 @@ class CreateUserWebController
 			});
 
 			if (useCaseResponse instanceof Error) {
+				if (useCaseResponse instanceof UserAlreadyLoggedError) {
+					return redirect("/");
+				}
+
 				const isInvalidInputError =
 					useCaseResponse instanceof InvalidInputError;
 
@@ -77,7 +72,7 @@ class CreateUserWebController
 
 type CreateUserUseCase = UseCase<
 	CreateUserDTO,
-	CreatedUserDTO | LoginExistsError | InvalidInputError
+	CreatedUserDTO | LoginExistsError | InvalidInputError | UserAlreadyLoggedError
 >;
 
 export default CreateUserWebController;

@@ -1,4 +1,4 @@
-import type { Session, SessionManager } from "@/presentation/ports";
+import type { Session, SessionManager } from "@/use-cases/ports";
 import type { FastifySessionObject } from "@fastify/session";
 
 class FastifySessionManagerAdapter implements SessionManager {

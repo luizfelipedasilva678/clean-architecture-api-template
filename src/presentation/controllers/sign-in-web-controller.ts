@@ -1,13 +1,15 @@
 import BaseWebController from "@/presentation/controllers/base-web-controller";
 import { badRequest, ok, internalServerError, redirect } from "@/shared";
 import type { SignDTO, SuccessfulSignInDTO, UseCase } from "@/use-cases/ports";
-import type { IncorrectUserOrPasswordError } from "@/use-cases/sign-in/errors";
+import {
+	type IncorrectUserOrPasswordError,
+	UserAlreadyLoggedError,
+} from "@/use-cases/sign-in/errors";
 import type {
 	Controller,
 	HttpRedirect,
 	HttpRequest,
 	HttpResponse,
-	SessionManager,
 } from "@/presentation/ports";
 
 class SignInWebController
@@ -15,24 +17,16 @@ class SignInWebController
 	implements Controller<HttpRequest, HttpResponse | HttpRedirect>
 {
 	private readonly useCase: SignInUseCase;
-	private readonly sessionManager: SessionManager;
 
-	constructor(useCase: SignInUseCase, sessionManager: SessionManager) {
+	constructor(useCase: SignInUseCase) {
 		super();
 		this.useCase = useCase;
-		this.sessionManager = sessionManager;
 	}
 
 	public async execute(
 		request: HttpRequest,
 	): Promise<HttpResponse | HttpRedirect> {
 		try {
-			const session = this.sessionManager.get();
-
-			if (session.authenticated) {
-				return redirect("/");
-			}
-
 			const missingParams = this.getMissingParams(
 				["login", "password"],
 				request.body,
@@ -50,18 +44,14 @@ class SignInWebController
 			});
 
 			if (useCaseResponse instanceof Error) {
+				if (useCaseResponse instanceof UserAlreadyLoggedError) {
+					return redirect("/");
+				}
+
 				return badRequest({
 					message: useCaseResponse.message,
 				});
 			}
-
-			this.sessionManager.create({
-				authenticated: useCaseResponse.authenticated,
-				user: {
-					id: useCaseResponse.id,
-					login: useCaseResponse.login,
-				},
-			});
 
 			return ok(useCaseResponse);
 		} catch (error) {
@@ -72,7 +62,7 @@ class SignInWebController
 
 type SignInUseCase = UseCase<
 	SignDTO,
-	SuccessfulSignInDTO | IncorrectUserOrPasswordError
+	SuccessfulSignInDTO | IncorrectUserOrPasswordError | UserAlreadyLoggedError
 >;
 
 export default SignInWebController;

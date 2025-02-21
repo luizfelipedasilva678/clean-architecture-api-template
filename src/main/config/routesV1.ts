@@ -1,39 +1,33 @@
-import { FastifyAdapter, FastifySessionManagerAdapter } from "@/main/adapters";
+import { FastifyAdapter } from "@/main/adapters";
 import type { HttpRedirect, HttpResponse } from "@/presentation/ports";
 import { internalServerError } from "@/shared";
 import type { FastifyInstance, FastifyReply } from "fastify";
-import makeWelcomeMessageWebService from "../factories/makeWelcomeMessageWebService";
+import { FastifySessionManagerAdapter } from "@/external/session-manager";
 import {
 	makeCreateUserWebController,
 	makeSignInWebController,
-	makeSignOutWebService,
+	makeGetLoggedUserWebController,
+	makeSignOutWebController,
 } from "@/main/factories";
-import makeGetSessionService from "../factories/makeGetSessionService";
 
 function routesV1(
 	app: FastifyInstance,
 	_: Record<string, unknown>,
 	done: (error?: Error) => void,
 ) {
+	app.get("/", async (_, response) => {
+		response.send({
+			message: "Clean Arch Template",
+		});
+	});
+
 	app.get("/session", async (request, response) => {
 		try {
 			const sessionManager = new FastifySessionManagerAdapter(request.session);
-			const service = await makeGetSessionService(sessionManager);
-			const serviceResponse = await service.execute();
+			const controller = await makeGetLoggedUserWebController(sessionManager);
+			const controllerResponse = await controller.execute();
 
-			return sendResponse(response, serviceResponse);
-		} catch (err) {
-			return handleError(response);
-		}
-	});
-
-	app.get("/", async (request, response) => {
-		try {
-			const sessionManager = new FastifySessionManagerAdapter(request.session);
-			const service = await makeWelcomeMessageWebService(sessionManager);
-			const serviceResponse = await service.execute();
-
-			return sendResponse(response, serviceResponse);
+			return sendResponse(response, controllerResponse);
 		} catch (err) {
 			return handleError(response);
 		}
@@ -76,13 +70,13 @@ function routesV1(
 	app.get("/sign-out", async (request, response) => {
 		try {
 			const sessionManager = new FastifySessionManagerAdapter(request.session);
-			const service = await makeSignOutWebService(sessionManager);
-			const serviceResponse = await service.execute();
+			const controller = await makeSignOutWebController(sessionManager);
+			const controllerResponse = await controller.execute();
 
-			if (shouldRedirect(serviceResponse))
-				return redirect(response, app.prefix + serviceResponse.url);
+			if (shouldRedirect(controllerResponse))
+				return redirect(response, app.prefix + controllerResponse.url);
 
-			return sendResponse(response, serviceResponse);
+			return sendResponse(response, controllerResponse);
 		} catch (err) {
 			return handleError(response);
 		}

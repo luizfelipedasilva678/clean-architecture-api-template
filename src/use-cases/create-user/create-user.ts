@@ -3,6 +3,7 @@ import type CreateUserInputValidator from "@/use-cases/ports/create-user-input-v
 import {
 	InvalidInputError,
 	LoginExistsError,
+	UserAlreadyLoggedError,
 } from "@/use-cases/create-user/errors";
 import type {
 	CreateUserDTO,
@@ -10,32 +11,48 @@ import type {
 	UseCase,
 	CreatedUserDTO,
 	UserRepository,
+	SessionManager,
 } from "@/use-cases/ports";
 
 class CreateUser
 	implements
 		UseCase<
 			CreateUserDTO,
-			CreatedUserDTO | LoginExistsError | InvalidInputError
+			| CreatedUserDTO
+			| LoginExistsError
+			| InvalidInputError
+			| UserAlreadyLoggedError
 		>
 {
 	private readonly userRepository: UserRepository;
 	private readonly inputValidator: CreateUserInputValidator;
 	private readonly encoder: Encoder;
+	private readonly sessionManager: SessionManager;
 
 	constructor(
 		userRepository: UserRepository,
 		inputValidator: CreateUserInputValidator,
 		encoder: Encoder,
+		sessionManager: SessionManager,
 	) {
 		this.inputValidator = inputValidator;
 		this.userRepository = userRepository;
 		this.encoder = encoder;
+		this.sessionManager = sessionManager;
 	}
 
 	public async execute(
 		input: CreateUserDTO,
-	): Promise<CreatedUserDTO | LoginExistsError | InvalidInputError> {
+	): Promise<
+		| CreatedUserDTO
+		| LoginExistsError
+		| InvalidInputError
+		| UserAlreadyLoggedError
+	> {
+		if (this.sessionManager.get().authenticated) {
+			return new UserAlreadyLoggedError();
+		}
+
 		const validationResult = this.inputValidator.validate(input);
 
 		if (validationResult.length > 0) {
