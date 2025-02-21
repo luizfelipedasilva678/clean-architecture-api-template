@@ -28,6 +28,13 @@ you like.
 | **Method**  | **Route**   | **Description**             |
 | GET         | `/sign-out` | destroy the current session |
 
+### Session
+
+| `/session` |            |                             |     |
+| ---------- | ---------- | --------------------------- | --- |
+| **Method** | **Route**  | **Description**             |
+| GET        | `/session` | returns the current session |
+
 ## How to run the project
 
 ### Database
