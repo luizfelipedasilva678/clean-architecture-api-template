@@ -1,17 +1,20 @@
 import { expect, it, describe, beforeAll } from "vitest";
 import { SignIn } from "@/use-cases/sign-in";
-import { BcryptJsEncoder } from "@/external/encoder";
 import InMemoryUserRepository from "./doubles/InMemoryUserRepository";
+import SessionManagerDouble from "./doubles/SessionManagerDouble";
+import EncoderDouble from "./doubles/EncoderDouble";
 
 describe("Sign In", () => {
   let repository: InMemoryUserRepository;
   let useCase: SignIn;
-  let encoder: BcryptJsEncoder;
+  let encoder: EncoderDouble;
+  let sessionManager: SessionManagerDouble;
 
   beforeAll(() => {
     repository = new InMemoryUserRepository();
-    encoder = new BcryptJsEncoder();
-    useCase = new SignIn(repository, encoder);
+    encoder = new EncoderDouble();
+    sessionManager = new SessionManagerDouble();
+    useCase = new SignIn(repository, encoder, sessionManager);
   });
 
   it("should return an error if user does not exist", async () => {

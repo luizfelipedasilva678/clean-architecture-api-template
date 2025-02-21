@@ -120,7 +120,7 @@ describe("Rest API", () => {
 
     const message = JSON.parse(response.body).message;
 
-    expect(message).toBe("Hello, visitor");
+    expect(message).toBe("Clean Arch Template");
     expect(response.statusCode).toBe(200);
   });
 });

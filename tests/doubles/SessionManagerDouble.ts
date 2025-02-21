@@ -1,4 +1,4 @@
-import { SessionManager, Session } from "@/presentation/ports";
+import { SessionManager, Session } from "@/use-cases/ports";
 
 class SessionManagerDouble implements SessionManager {
   private session: Session = {

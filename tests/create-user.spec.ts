@@ -6,20 +6,24 @@ import Validator from "./doubles/CreateUserValidator";
 import {
   InvalidInputError,
   LoginExistsError,
+  UserAlreadyLoggedError,
 } from "@/use-cases/create-user/errors";
-import { BcryptJsEncoder } from "@/external/encoder";
+import SessionManagerDouble from "./doubles/SessionManagerDouble";
+import EncoderDouble from "./doubles/EncoderDouble";
 
 describe("Create User", () => {
   let repository: InMemoryUserRepository;
   let useCase: CreateUser;
   let validator: CreateUserInputValidator;
-  let encoder: BcryptJsEncoder;
+  let encoder: EncoderDouble;
+  let sessionManager: SessionManagerDouble;
 
   beforeAll(() => {
     repository = new InMemoryUserRepository();
     validator = new Validator();
-    encoder = new BcryptJsEncoder();
-    useCase = new CreateUser(repository, validator, encoder);
+    encoder = new EncoderDouble();
+    sessionManager = new SessionManagerDouble();
+    useCase = new CreateUser(repository, validator, encoder, sessionManager);
   });
 
   it("should create a user correctly", async () => {
@@ -54,5 +58,19 @@ describe("Create User", () => {
     });
 
     expect(createdUser).toBeInstanceOf(InvalidInputError);
+  });
+
+  it("should return an error if user is already logged", async () => {
+    sessionManager.create({
+      authenticated: true,
+    });
+
+    const createdUser = await useCase.execute({
+      name: "John Doe",
+      login: "johndoe",
+      password: "test123@",
+    });
+
+    expect(createdUser).toBeInstanceOf(UserAlreadyLoggedError);
   });
 });

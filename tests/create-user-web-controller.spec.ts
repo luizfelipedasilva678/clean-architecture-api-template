@@ -4,25 +4,25 @@ import { CreateUserWebController } from "@/presentation/controllers";
 import type CreateUserInputValidator from "@/use-cases/ports/create-user-input-validator";
 import Validator from "./doubles/CreateUserValidator";
 import InMemoryUserRepository from "./doubles/InMemoryUserRepository";
-import { BcryptJsEncoder } from "@/external/encoder";
 import SessionManagerDouble from "./doubles/SessionManagerDouble";
 import { HttpResponse } from "@/presentation/ports";
+import EncoderDouble from "./doubles/EncoderDouble";
 
 describe("Create User Web Controller", () => {
   let repository: InMemoryUserRepository;
   let useCase: CreateUser;
   let validator: CreateUserInputValidator;
   let controller: CreateUserWebController;
-  let encoder: BcryptJsEncoder;
+  let encoder: EncoderDouble;
   let sessionManager: SessionManagerDouble;
 
   beforeAll(() => {
     repository = new InMemoryUserRepository();
     validator = new Validator();
-    encoder = new BcryptJsEncoder();
-    useCase = new CreateUser(repository, validator, encoder);
+    encoder = new EncoderDouble();
     sessionManager = new SessionManagerDouble();
-    controller = new CreateUserWebController(useCase, sessionManager);
+    useCase = new CreateUser(repository, validator, encoder, sessionManager);
+    controller = new CreateUserWebController(useCase);
   });
 
   it("should create a user correctly", async () => {
