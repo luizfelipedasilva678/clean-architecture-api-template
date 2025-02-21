@@ -1,5 +1,9 @@
 import type { UseCase } from "@/use-cases/ports";
-import type { Controller, HttpRedirect, HttpResponse } from "@/presentation/ports";
+import type {
+	Controller,
+	HttpRedirect,
+	HttpResponse,
+} from "@/presentation/ports";
 import { internalServerError, redirect } from "@/shared";
 
 class SignOutWebController
